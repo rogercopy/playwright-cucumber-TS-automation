@@ -14,7 +14,7 @@ const browserInstances: Browser[] = [];
 
 Before(async function (this: ICustomWorld) {
   // Launch a new browser and store it in our global array
-  const newBrowser = await chromium.launch({ headless: false });
+  const newBrowser = await chromium.launch({ headless: true });
   browserInstances.push(newBrowser);
 
   this.context = await newBrowser.newContext();
