@@ -52,6 +52,7 @@ jobs:
         echo "TRELLO_BOARD_LIST_ID=${{ secrets.TRELLO_BOARD_LIST_ID }}" >> $GITHUB_ENV
         echo "TRELLO_LOGIN_EMAIL=${{secrets.TRELLO_LOGIN_EMAIL}}" >> $GITHUB_ENV
         echo "TRELLO_LOGIN_PASSWORD=${{secrets.TRELLO_LOGIN_PASSWORD}}" >> $GITHUB_ENV
+        echo "TRELLO_2FA_SETUP_KEY=${{secrets.TRELLO_2FA_SETUP_KEY}}" >> $GITHUB_ENV
 
     - name: Run Playwright Cucumber tests
       run: npm run ${{ github.event.inputs.test_type }}
