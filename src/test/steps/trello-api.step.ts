@@ -60,7 +60,6 @@ When('Send Delete Request to the board', async function () {
 
 Given('Send Get Request with board id to retrieve the Lists', async () => {
     const id = trelloBoardId;
-
     response = await context.get(`/1/boards/${id}/lists?key=${key}&token=${token}`, {
         headers: {
             'Accept': 'application/json',

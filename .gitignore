@@ -9,3 +9,4 @@ node_modules/
 .env_sample
 src/test/utils/totp.js
 failure.png
+codegen-output.ts
