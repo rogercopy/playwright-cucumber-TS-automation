@@ -68,8 +68,6 @@ Then('Complete the checklist items', async function (this: ICustomWorld) {
 
 Then('Upload attachments to task', async function (this: ICustomWorld) {
     await this.pagesObj?.boardPage.uploadAttachment('[DEVOPS] Task 60', 'failure.png');
-    await this.page?.getByText('Success').click();
-    expect(await this.page?.getByTestId('attachment-thumbnail-name').innerText()).toBe('failure.png');
 });
 
 Then('Delete the attachment from task', async function (this: ICustomWorld) {

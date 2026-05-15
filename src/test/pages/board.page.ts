@@ -8,10 +8,6 @@ export class BoardPage extends BasePage {
     readonly photosButton: Locator;
     readonly boardTitleInput: Locator;
     readonly createBoardSubmitButton: Locator;
-    readonly workspaceSwitcher: Locator;
-    //readonly workspaceSwitcherTile: Locator;
-    readonly downIcon: Locator;
-
     // List Locators
     readonly listComposerButton: Locator;
     readonly listNameInput: Locator;
@@ -62,10 +58,6 @@ export class BoardPage extends BasePage {
         this.photosButton = page.locator('header').filter({ hasText: 'PhotosSee more' }).getByRole('button');
         this.boardTitleInput = page.getByTestId('create-board-title-input');
         this.createBoardSubmitButton = page.getByTestId('create-board-submit-button');
-        this.downIcon = page.getByTestId('DownIcon');
-        this.workspaceSwitcher = page.getByTestId('home-team-boards-tab');
-        //this.workspaceSwitcherTile = page.getByTestId('workspace-switcher-popover-tile');
-
         // Initialize List Locators
         this.listComposerButton = page.getByTestId('list-composer-button');
         this.listNameInput = page.getByPlaceholder('Enter list name…');
@@ -117,10 +109,8 @@ export class BoardPage extends BasePage {
     }
 
     async switchToProjectWorkspace() {
-        await this.page?.screenshot({ path: 'screenshots/failure.png' });
-        await this.downIcon.click();
-        await this.workspaceSwitcher.click();
-        //await this.workspaceSwitcherTile.click();
+        await this.page.getByRole('link', { name: 'P Playwright Practice' }).click();
+        await this.page.getByTestId('home-team-boards-tab').click();
     }
 
     async createLists(listNames: string[]) {
@@ -184,12 +174,10 @@ export class BoardPage extends BasePage {
     }
 
     async uploadAttachment(cardName: string, filePath: string) {
-        await this.page.getByTestId('card-name').filter({ hasText: cardName }).click();
-        await this.addToCardButton.click();
+        await this.page.getByRole('link', { name: cardName }).click();
+        await this.page.getByRole('button', { name: 'Add to card' }).click();
         await this.attachmentButton.click();
-        //await this.chooseFileButton.click();
-        //await this.chooseFileButton.setInputFiles(filePath);
-        await this.page.setInputFiles('#card-attachment-file-picker', filePath);
+        await this.page.locator('#card-attachment-file-picker').setInputFiles(filePath);
     }
 
     async deleteAttachment(cardName: string) {
@@ -223,8 +211,7 @@ export class BoardPage extends BasePage {
     }
 
     async switchToBoard(boardName: string): Promise<void> {
-        //await this.page.locator('div.LinesEllipsis').getByText(boardName).click();
-        await this.page.getByRole('link', { name: `${boardName}` }).click();
+        await this.page.getByRole('link', { name: boardName }).click();
     }
 
     async clearClosedBoards(): Promise<void> {
