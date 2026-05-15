@@ -5,8 +5,8 @@
   "scripts": {
     "test": "npm run test",
     "test:crud": "cucumber-js features/**/*.api.feature --tags @crud --require-module ts-node/register --require ./src/steps/**/*.ts --format progress-bar",
-    "test:ui": "cucumber-js src/test/features/*.ui.feature --tags @ui --require-module ts-node/register --require src/test/steps/*.ts --format progress-bar",
-    "test:ui:ci": "xvfb-run cucumber-js features/**/*.ui.feature --tags @ui --require-module ts-node/register --require ./src/steps/**/*.ts --format progress-bar"
+    "test:ui": "cross-env HEADLESS=false cucumber-js src/test/features/*.ui.feature --tags @ui --require-module ts-node/register --require src/test/steps/*.ts --format progress-bar",
+    "test:ui:ci": "cucumber-js src/test/features/*.ui.feature --tags @ui --require-module ts-node/register --require src/test/steps/*.ts --format progress-bar"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,7 @@
     "@cucumber/cucumber": "^11.3.0",
     "@playwright/test": "^1.53.2",
     "@types/node": "^22.15.34",
+    "cross-env": "^10.1.0",
     "dotenv": "^16.6.1",
     "prompt-sync": "^4.2.0",
     "ts-node": "^10.9.2"
