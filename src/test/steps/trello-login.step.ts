@@ -17,8 +17,8 @@ Before(async function (this: ICustomWorld) {
   const newBrowser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
   browserInstances.push(newBrowser);
 
-  this.context = await newBrowser.newContext();
-  this.page = await newBrowser.newPage();
+  this.context = await newBrowser.newContext({ viewport: { width: 1920, height: 1080 } });
+  this.page = await this.context.newPage();
   this.pagesObj = new AllPagesObject(this.page, this.page.context());
 });
 
