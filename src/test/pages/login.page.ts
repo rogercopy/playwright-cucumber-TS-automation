@@ -1,5 +1,5 @@
 // pages/login.page.ts
-import { BrowserContext, ElementHandle, Locator, Page } from "@playwright/test";
+import { BrowserContext, Locator, Page } from "@playwright/test";
 import { authenticator } from "otplib";
 import {
   trelloLoginEmail,
@@ -10,20 +10,20 @@ import {
 import { BasePage } from "./base.page";
 
 export class LoginPage extends BasePage {
-  private homePageLoginBtn: string;
-  private usernameInput: string;
-  private passwordInput: string;
-  private submitLoginBtn: string;
+  private homePageLoginBtn: Locator;
+  private usernameInput: Locator;
+  private passwordInput: Locator;
+  private submitLoginBtn: Locator;
   private viewCloseBoardsBtn: Locator;
   private deleteBoardBtn: Locator;
   private confirmDeleteBoardBtn: Locator;
 
   constructor(page: Page, context: BrowserContext) {
     super(page, context);
-    this.homePageLoginBtn = ".Buttonsstyles__Button-sc-1jwidxo-0.kTwZBr";
-    this.usernameInput = "#username-uid1";
-    this.passwordInput = "#password";
-    this.submitLoginBtn = "#login-submit";
+    this.homePageLoginBtn = page.getByRole('link', { name: 'Log in', exact: true });
+    this.usernameInput = page.getByTestId('username');
+    this.passwordInput = page.getByTestId('password');
+    this.submitLoginBtn = page.getByTestId('login-submit-idf-testid');
     this.viewCloseBoardsBtn = this.page.getByRole("button", {
       name: "View all closed boards",
     });
@@ -36,17 +36,14 @@ export class LoginPage extends BasePage {
   }
 
   public async loginToTrelloAccount() {
-    // Navigate to Trello and click the login button
     await this.page.goto(trelloUIHost);
-    await this.page.click(this.homePageLoginBtn);
+    await this.homePageLoginBtn.click();
 
-    // Enter email and proceed
-    await this.page.fill(this.usernameInput, trelloLoginEmail);
-    await this.page.click(this.submitLoginBtn);
+    await this.usernameInput.fill(trelloLoginEmail);
+    await this.submitLoginBtn.click();
 
-    // Enter password and click login
-    await this.page.fill(this.passwordInput, trelloLoginPassword);
-    await this.page.click(this.submitLoginBtn);
+    await this.passwordInput.fill(trelloLoginPassword);
+    await this.submitLoginBtn.click();
 
     const totp = authenticator.generate(trello2FASetupKey);
     await this.page
@@ -71,6 +68,15 @@ export class LoginPage extends BasePage {
     }
 
     await this.page?.getByText('Log in', { exact: true }).click();
+
+    const dismissButton = this.page.getByRole('button', { name: 'Dismiss' });
+    const viewUpdatesButton = this.page.getByRole('button', { name: 'View updates' });
+    if (await dismissButton.isVisible({ timeout: 10000 }).catch(() => false)) {
+      await dismissButton.click();
+    } else if (await viewUpdatesButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await viewUpdatesButton.click();
+      await this.page.getByRole('button', { name: 'Close dialog' }).click();
+    }
   }
 
   public async clearClosedBoards() {

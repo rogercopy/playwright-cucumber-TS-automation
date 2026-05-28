@@ -1,21 +1,4 @@
-import * as readline from 'readline';
-import { Page, Browser } from '@playwright/test';
-import { authenticator } from 'otplib';
-import { trello2FASetupKey } from './constants';
-
-export async function getUserInput(): Promise<string> {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-
-    return new Promise((resolve) => {
-        rl.question('Please enter your input: ', (answer) => {
-            rl.close();
-            resolve(answer);
-        });
-    });
-}
+import { Browser } from '@playwright/test';
 
 export async function cleanupBrowsers(browserInstances: Browser[]) {
     for (const browser of browserInstances) {
@@ -36,12 +19,4 @@ export async function cleanupBrowsers(browserInstances: Browser[]) {
             console.error('Error closing browser:', error);
         }
     }
-}
-
-export async function generateRandomTemplate() {
-    const names = ['Coffee', 'Tea', 'Biscuits', 'Chips', 'Sugar', 'Smoothie', 'Dates'];
-
-    const randomtemplateName = names[Math.floor(Math.random() * names.length)];
-
-    return randomtemplateName;
 }

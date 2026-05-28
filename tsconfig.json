@@ -3,7 +3,7 @@
     "target": "es2016",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "lib": ["dom","es6"],
     "module": "commonjs",
-    "types": ["cypress"],
+    "types": ["node"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
