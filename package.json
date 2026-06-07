@@ -5,8 +5,8 @@
   "scripts": {
     "test": "npm run test",
     "test:crud": "cucumber-js features/**/*.api.feature --tags @crud --require-module ts-node/register --require ./src/steps/**/*.ts --format progress-bar",
-    "test:ui": "cross-env HEADLESS=false cucumber-js src/test/features/*.ui.feature --tags @ui --require-module ts-node/register --require src/test/steps/*.ts --require src/test/support/*.ts --format progress-bar",
-    "test:ui:ci": "cucumber-js src/test/features/*.ui.feature --tags @ui --require-module ts-node/register --require src/test/steps/*.ts --require src/test/support/*.ts --format progress-bar"
+    "test:ui": "cross-env HEADLESS=false cucumber-js \"src/test/features/*.ui.feature\" --tags @ui --require-module ts-node/register --require \"src/test/steps/*.ts\" --require \"src/test/support/*.ts\" --format progress-bar",
+    "test:ui:ci": "cucumber-js \"src/test/features/*.ui.feature\" --tags @ui --require-module ts-node/register --require \"src/test/steps/*.ts\" --require \"src/test/support/*.ts\" --format progress"
   },
   "keywords": [],
   "author": "",
