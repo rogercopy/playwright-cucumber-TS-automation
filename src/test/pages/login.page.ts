@@ -45,66 +45,27 @@ export class LoginPage extends BasePage {
     await this.passwordInput.fill(trelloLoginPassword);
     await this.submitLoginBtn.click();
 
-    // const totp = authenticator.generate(trello2FASetupKey);
-    // await this.page
-    //   ?.getByRole("textbox", { name: "-digit verification code" })
-    //   .fill(totp);
-    // const errorLocator = this.page?.locator('#otpCode-uid17-error');
-
-    // // Check if the error is visible
-    // while (await errorLocator.isVisible()) {
-    //   const errorText = await errorLocator.innerText();
-
-    //   if (errorText.includes('You entered an incorrect verification code.')) {
-    //     console.log('⚠️ Incorrect verification code detected — retrying with fresh TOTP.');
-    //     const otpInput = this.page?.getByRole("textbox", { name: "-digit verification code" });
-    //     await otpInput?.clear();
-    //     await otpInput?.fill(authenticator.generate(trello2FASetupKey));
-    //     await this.page?.waitForTimeout(3000);
-    //   } else {
-    //     break;
-    //   }
-    // }
-
     const totp = authenticator.generate(trello2FASetupKey);
-await this.page
-  ?.getByRole("textbox", { name: "-digit verification code" })
-  .fill(totp);
+    await this.page
+      ?.getByRole("textbox", { name: "-digit verification code" })
+      .fill(totp);
+    const errorLocator = this.page?.locator('#otpCode-uid17-error');
 
-const errorLocator = this.page?.locator('[id$="-error"]'); // match dynamic ID by suffix
-const submitButton = this.page?.getByRole("button", { name: /verify/i }); // adjust selector
+    // Check if the error is visible
+    while (await errorLocator.isVisible()) {
+      const errorText = await errorLocator.innerText();
 
-const maxRetries = 3;
-let attempts = 0;
-
-while (attempts < maxRetries && await errorLocator.isVisible()) {
-  const errorText = await errorLocator.innerText();
-
-  if (errorText.includes('You entered an incorrect verification code.')) {
-    console.log(`⚠️ Incorrect TOTP — retry attempt ${attempts + 1}`);
-
-    // Wait until we're in a fresh TOTP window (at least 5s buffer)
-    const secondsRemaining = 30 - (Math.floor(Date.now() / 1000) % 30);
-    const waitMs = (secondsRemaining + 2) * 1000; // +2s buffer
-    console.log(`⏳ Waiting ${waitMs / 1000}s for fresh TOTP window...`);
-    await this.page?.waitForTimeout(waitMs);
-
-    const freshTotp = authenticator.generate(trello2FASetupKey);
-    const otpInput = this.page?.getByRole("textbox", { name: "-digit verification code" });
-    await otpInput?.clear();
-    await otpInput?.fill(freshTotp);
-    await submitButton?.click(); // 👈 this was missing
-    await this.page?.waitForTimeout(1500); // let the response settle
-  } else {
-    break;
-  }
-
-  attempts++;
-}
-
-if (attempts === maxRetries) {
-  throw new Error('TOTP verification failed after max retries');
-}
+      if (errorText.includes('You entered an incorrect verification code.')) {
+        console.log('⚠️ Incorrect verification code detected — retrying with fresh TOTP.');
+        const otpInput = this.page?.getByRole("textbox", { name: "-digit verification code" });
+        await otpInput?.clear();
+        await otpInput?.fill(authenticator.generate(trello2FASetupKey));
+        //await this.page?.getByText('Log in', { exact: true }).click();
+        await this.page?.waitForTimeout(3000);
+      } else {
+        break;
+      }
+    }
 
     await this.page?.getByText('Log in', { exact: true }).click();
 
