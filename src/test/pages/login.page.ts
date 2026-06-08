@@ -49,7 +49,7 @@ export class LoginPage extends BasePage {
     await this.page
       ?.getByRole("textbox", { name: "-digit verification code" })
       .fill(totp);
-    const errorLocator = this.page?.locator('#otpCode-uid1-error');
+    const errorLocator = this.page?.locator('#otpCode-uid17-error');
 
     // Check if the error is visible
     while (await errorLocator.isVisible()) {
