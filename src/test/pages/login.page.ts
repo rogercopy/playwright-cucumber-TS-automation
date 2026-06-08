@@ -56,14 +56,13 @@ export class LoginPage extends BasePage {
       const errorText = await errorLocator.innerText();
 
       if (errorText.includes('You entered an incorrect verification code.')) {
-        console.log('⚠️ Incorrect verification code detected — refreshing page.');
-        await this.page?.reload();
-        //const totp = authenticator.generate(trello2FASetupKey);
-        await this.page
-          ?.getByRole("textbox", { name: "-digit verification code" })
-          .fill(authenticator.generate(trello2FASetupKey));
+        console.log('⚠️ Incorrect verification code detected — retrying with fresh TOTP.');
+        const otpInput = this.page?.getByRole("textbox", { name: "-digit verification code" });
+        await otpInput?.clear();
+        await otpInput?.fill(authenticator.generate(trello2FASetupKey));
+        await this.page?.waitForTimeout(3000);
       } else {
-        break; // error is visible, but not the one we care about
+        break;
       }
     }
 
