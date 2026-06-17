@@ -10,3 +10,5 @@ node_modules/
 src/test/utils/totp.js
 failure.png
 codegen-output.ts
+/screenshots/
+auth-state.json
