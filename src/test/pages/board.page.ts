@@ -178,6 +178,7 @@ export class BoardPage extends BasePage {
         await this.page.getByRole('button', { name: 'Add to card' }).click();
         await this.attachmentButton.click();
         await this.page.locator('#card-attachment-file-picker').setInputFiles(filePath);
+        await this.page.getByTestId('attachment-thumbnail').first().waitFor({ state: 'visible' });
     }
 
     async deleteAttachment(cardName: string) {

@@ -17,12 +17,11 @@ on:
       test_type:
         description: 'Select test type'
         required: true
-        default: 'test:crud'
+        default: 'test:ui:ci'
         type: choice
         options:
           - test:ui:ci
           - test:crud
-          - test:ui
 
 jobs:
   test:

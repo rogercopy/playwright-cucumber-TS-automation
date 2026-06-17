@@ -37,6 +37,15 @@ export class LoginPage extends BasePage {
 
   public async loginToTrelloAccount() {
     await this.page.goto(trelloUIHost);
+
+    const needsLogin = await this.homePageLoginBtn
+      .waitFor({ state: 'visible', timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!needsLogin) {
+      return;
+    }
+
     await this.homePageLoginBtn.click();
 
     await this.usernameInput.fill(trelloLoginEmail);
@@ -45,37 +54,49 @@ export class LoginPage extends BasePage {
     await this.passwordInput.fill(trelloLoginPassword);
     await this.submitLoginBtn.click();
 
-    const totp = authenticator.generate(trello2FASetupKey);
-    await this.page
-      ?.getByRole("textbox", { name: "-digit verification code" })
-      .fill(totp);
-    const errorLocator = this.page?.locator('#otpCode-uid1-error');
+    const otpInput = this.page.getByRole("textbox", { name: "-digit verification code" });
+    const errorLocator = this.page.getByTestId('form-text-field--input-invalid-error-message-field--idf-testid');
+    const otpLoginButton = this.page.getByRole('button', { name: 'Log in' });
 
-    // Check if the error is visible
-    while (await errorLocator.isVisible()) {
+    await otpInput.fill(authenticator.generate(trello2FASetupKey));
+    await otpLoginButton.click();
+
+    const errorAppeared = () =>
+      errorLocator.waitFor({ state: 'visible', timeout: 7000 })
+        .then(() => true)
+        .catch(() => false);
+
+    let attempts = 0;
+    while ((await errorAppeared()) && attempts < 2) {
+      attempts++;
       const errorText = await errorLocator.innerText();
-
-      if (errorText.includes('You entered an incorrect verification code.')) {
-        console.log('⚠️ Incorrect verification code detected — refreshing page.');
-        await this.page?.reload();
-        //const totp = authenticator.generate(trello2FASetupKey);
-        await this.page
-          ?.getByRole("textbox", { name: "-digit verification code" })
-          .fill(authenticator.generate(trello2FASetupKey));
-      } else {
-        break; // error is visible, but not the one we care about
+      if (!errorText.includes('You entered an incorrect verification code.')) {
+        break;
       }
+      console.log(`⚠️ OTP rejected (attempt ${attempts}) — waiting for fresh TOTP window.`);
+      await this.page.waitForTimeout(32000);
+      await otpInput.clear();
+      await otpInput.fill(authenticator.generate(trello2FASetupKey));
+      await otpLoginButton.click();
     }
-
-    await this.page?.getByText('Log in', { exact: true }).click();
 
     const dismissButton = this.page.getByRole('button', { name: 'Dismiss' });
     const viewUpdatesButton = this.page.getByRole('button', { name: 'View updates' });
-    if (await dismissButton.isVisible({ timeout: 10000 }).catch(() => false)) {
+    const dismissed = await dismissButton
+      .waitFor({ state: 'visible', timeout: 10000 })
+      .then(() => true)
+      .catch(() => false);
+    if (dismissed) {
       await dismissButton.click();
-    } else if (await viewUpdatesButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await viewUpdatesButton.click();
-      await this.page.getByRole('button', { name: 'Close dialog' }).click();
+    } else {
+      const updatesShown = await viewUpdatesButton
+        .waitFor({ state: 'visible', timeout: 3000 })
+        .then(() => true)
+        .catch(() => false);
+      if (updatesShown) {
+        await viewUpdatesButton.click();
+        await this.page.getByRole('button', { name: 'Close dialog' }).click();
+      }
     }
   }
 

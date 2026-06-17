@@ -63,9 +63,14 @@ npm run test:ui:ci
 - Playwright reports will be saved in the `playwright-report/` directory.
 
 ## Debugging
-- To debug tests, you can run them in non-headless mode by modifying the `playwright.config.ts` file or using the `--headed` flag:
+- To debug tests, run them in headed (non-headless) mode — the browser window will be visible:
   ```bash
-  npx playwright test --headed
+  npm run test:ui
+  ```
+  (The `test:ui` script sets `HEADLESS=false`.)
+- To force headless mode locally (matches CI behavior):
+  ```bash
+  HEADLESS=true npm run test:ui
   ```
 
 ## Additional Notes

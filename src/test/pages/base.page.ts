@@ -1,5 +1,4 @@
-import config from "../../../config";
-import { Page, BrowserContext, Locator, Response } from "@playwright/test";
+import { Page, BrowserContext, Locator } from "@playwright/test";
 import { join } from "path";
 
 export class BasePage {
@@ -12,12 +11,6 @@ export class BasePage {
     this.context = context;
     this.header = this.page.locator("h1");
   }
-
-//   public goto(optionalUrl?: string): Promise<Response | null> {
-//     const pageToGoTo = optionalUrl ? (config.baseUrl += optionalUrl) : config.baseUrl;
-
-//     return this.page.goto(pageToGoTo);
-//   }
 
   public screenshot(name: string): Promise<Buffer> | undefined {
     return this.page.screenshot({ path: join("screenshots", `${name}.png`) });
