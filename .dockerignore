@@ -1,0 +1,10 @@
+node_modules/
+.env
+auth-state.json
+screenshots/
+test-results/
+playwright-report/
+cucumber-json/
+.git/
+.agents/
+*.png
