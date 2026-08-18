@@ -7,4 +7,3 @@ playwright-report/
 cucumber-json/
 .git/
 .agents/
-*.png
