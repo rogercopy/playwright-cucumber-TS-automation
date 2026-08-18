@@ -2,9 +2,9 @@ name: Playwright Cucumber Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
     inputs:
       environment:
@@ -32,29 +32,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+    - name: Build Docker image
+      run: docker build -t playwright-cucumber .
 
-    - name: Install dependencies
-      run: npm install
-
-    - name: Install Playwright Browsers
-      run: npx playwright install chromium
-
-    - name: Set Environment Variables
+    - name: Run Playwright Cucumber tests in Docker
       run: |
-        echo "TRELLO_API_KEY=${{ secrets.TRELLO_API_KEY }}" >> $GITHUB_ENV
-        echo "TRELLO_API_TOKEN=${{ secrets.TRELLO_API_TOKEN }}" >> $GITHUB_ENV
-        echo "TRELLO_BOARD_ID=${{ secrets.TRELLO_BOARD_ID }}" >> $GITHUB_ENV
-        echo "TRELLO_BOARD_LIST_ID=${{ secrets.TRELLO_BOARD_LIST_ID }}" >> $GITHUB_ENV
-        echo "TRELLO_LOGIN_EMAIL=${{secrets.TRELLO_LOGIN_EMAIL}}" >> $GITHUB_ENV
-        echo "TRELLO_LOGIN_PASSWORD=${{secrets.TRELLO_LOGIN_PASSWORD}}" >> $GITHUB_ENV
-        echo "TRELLO_2FA_SETUP_KEY=${{secrets.TRELLO_2FA_SETUP_KEY}}" >> $GITHUB_ENV
-
-    - name: Run Playwright Cucumber tests
-      run: npm run ${{ github.event.inputs.test_type }}
+        docker run --rm \
+          --ipc=host \
+          -e TRELLO_API_KEY="${{ secrets.TRELLO_API_KEY }}" \
+          -e TRELLO_API_TOKEN="${{ secrets.TRELLO_API_TOKEN }}" \
+          -e TRELLO_BOARD_ID="${{ secrets.TRELLO_BOARD_ID }}" \
+          -e TRELLO_BOARD_LIST_ID="${{ secrets.TRELLO_BOARD_LIST_ID }}" \
+          -e TRELLO_LOGIN_EMAIL="${{ secrets.TRELLO_LOGIN_EMAIL }}" \
+          -e TRELLO_LOGIN_PASSWORD="${{ secrets.TRELLO_LOGIN_PASSWORD }}" \
+          -e TRELLO_2FA_SETUP_KEY="${{ secrets.TRELLO_2FA_SETUP_KEY }}" \
+          -v $(pwd)/screenshots:/app/screenshots \
+          -v $(pwd)/cucumber-json:/app/cucumber-json \
+          -v $(pwd)/playwright-report:/app/playwright-report \
+          -v $(pwd)/test-results:/app/test-results \
+          playwright-cucumber npm run ${{ github.event.inputs.test_type || 'test:ui:ci' }}
 
     - name: Upload Error Screenshots
       uses: actions/upload-artifact@v4
@@ -62,6 +58,7 @@ jobs:
       with:
         name: error-screenshots
         path: screenshots/*.png
+        if-no-files-found: ignore
     
     - name: Upload Playwright test results
       uses: actions/upload-artifact@v4

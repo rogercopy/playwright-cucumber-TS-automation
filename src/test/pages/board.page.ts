@@ -177,7 +177,10 @@ export class BoardPage extends BasePage {
         await this.page.getByRole('link', { name: cardName }).click();
         await this.page.getByRole('button', { name: 'Add to card' }).click();
         await this.attachmentButton.click();
-        await this.page.locator('#card-attachment-file-picker').setInputFiles(filePath);
+        const fileChooserPromise = this.page.waitForEvent('filechooser');
+        await this.chooseFileButton.click();
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles(filePath);
         await this.page.getByTestId('attachment-thumbnail').first().waitFor({ state: 'visible' });
     }
 

@@ -4,9 +4,12 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test",
-    "test:crud": "cucumber-js features/**/*.api.feature --tags @crud --require-module ts-node/register --require ./src/steps/**/*.ts --format progress-bar",
+    "test:crud": "cucumber-js \"src/test/features/*.api.feature\" --tags @crud --require-module ts-node/register --require \"src/test/steps/*.ts\" --require \"src/test/support/*.ts\" --format progress-bar",
     "test:ui": "cross-env HEADLESS=false cucumber-js \"src/test/features/*.ui.feature\" --tags @ui --require-module ts-node/register --require \"src/test/steps/*.ts\" --require \"src/test/support/*.ts\" --format progress-bar",
-    "test:ui:ci": "cucumber-js \"src/test/features/*.ui.feature\" --tags @ui --require-module ts-node/register --require \"src/test/steps/*.ts\" --require \"src/test/support/*.ts\" --format progress"
+    "test:ui:ci": "cucumber-js \"src/test/features/*.ui.feature\" --tags @ui --require-module ts-node/register --require \"src/test/steps/*.ts\" --require \"src/test/support/*.ts\" --format progress",
+    "docker:build": "docker build -t playwright-cucumber .",
+    "docker:test:ui": "docker run --rm --ipc=host --env-file .env playwright-cucumber npm run test:ui:ci",
+    "docker:test:api": "docker run --rm --ipc=host --env-file .env playwright-cucumber npm run test:crud"
   },
   "keywords": [],
   "author": "",
